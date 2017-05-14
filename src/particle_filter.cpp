@@ -23,7 +23,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1.
 	// Add random Gaussian noise to each particle.
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
-	num_particles = 2;
+	num_particles = 200;
   particles.resize(num_particles);
 	weights.resize(num_particles);
 
@@ -39,9 +39,13 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 		p.x = dist_x(generator);
 		p.y = dist_y(generator);
 		p.theta = dist_theta(generator);
-		p.weight = 1.0;
-
-		weights[i] = 1.0;
+    if(i == 0) {
+      p.weight = 1.0;
+      weights[i] = 1.0;
+    } else {
+		    p.weight = 0.0;
+		    weights[i] = 0.0;
+  }
 
 		particles[i] = p;
 	}
@@ -63,14 +67,14 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 		for(int i; i < particles.size(); i++) {
 
 			//check and make sure yaw_rate is not zero and calc accordingly
-			if (fabs(yaw_rate) > .001) {
-        x = particles[i].x + velocity/yaw_rate*(sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
-        y = particles[i].y + -velocity/yaw_rate*(cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
-        theta = yaw_rate * delta_t + particles[i].theta;
-		} else {
+			if (fabs(yaw_rate) == 0.0) {
         x = particles[i].x + velocity*delta_t*cos(particles[i].theta);
         y =  particles[i].y + velocity*delta_t*sin(particles[i].theta);
         theta = particles[i].theta;
+		} else {
+        x = particles[i].x + velocity/yaw_rate*(sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
+        y = particles[i].y + -velocity/yaw_rate*(cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
+        theta = yaw_rate * delta_t + particles[i].theta;
 			}
 
 
@@ -140,7 +144,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			observation.y += observations[j].y * cos(particles[i].theta);
 			observation.y += particles[i].y;
 
-			observation.id = -1; //need an id yet???
+			observation.id = -1; //needs an id yet???
 
 			obs_map.push_back(observation);
 	}
