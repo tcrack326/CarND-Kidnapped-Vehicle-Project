@@ -214,6 +214,8 @@ void ParticleFilter::resample() {
 	// NOTE: You may find std::discrete_distribution helpful here.
 	//   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
 	//std::cout << "resample!" << std::endl;
+
+  //From Udacity Forum suggestions on resampling with discrete_distribution fx:
 	std::random_device rd;
   std::mt19937 generator_wts(rd());
   std::discrete_distribution<> d(weights.begin(), weights.end());
